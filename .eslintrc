@@ -1,0 +1,175 @@
+{
+    "parser": "babel-eslint",
+    "parserOptions": {
+      "allowImportExportEverywhere": true
+    },
+    "extends": ["airbnb",
+                "eslint:recommended",
+                "plugin:import/errors",
+                "plugin:import/warnings",
+                "plugin:jasmine/recommended"],
+    "env": {
+        "browser": true,
+        "node": true,
+        "jest": true,
+        "jasmine": true,
+        "webdriverio/wdio": true
+    },
+    "rules": {
+        "jasmine/no-spec-dupes": [1, "branch"],
+        "jasmine/new-line-before-expect": 0,
+        "jasmine/new-line-between-declarations": 0,
+        "comma-dangle": 0,
+        "no-useless-escape": 0,
+        "max-len": [1, {"code": 120}],
+        "indent": [1, 2, {"SwitchCase": 1}],
+        "no-unused-vars": [2, { "ignoreRestSiblings": true, "args": "after-used" }],
+        "react/prop-types": 0,
+        "global-require": 0,
+        "no-underscore-dangle": ["error", { "allow": ["_type"] }],
+        "import/no-unresolved": [0, {"commonjs": true, "amd": true}],
+        "import/no-extraneous-dependencies": [0],
+        "import/extensions": [0],
+        "import/first": [0],
+        "import/newline-after-import": [0],
+        "import/namespace": "warn",
+        "react/jsx-filename-extension": [0],
+        "import/prefer-default-export": [0],
+        "react/require-default-props": [0],
+        "react/forbid-prop-types": [0],
+        "react/no-find-dom-node": "warn",
+        "react/jsx-curly-brace-presence": "warn",
+        "react/no-unused-prop-types": [0],
+        "jsx-a11y/label-has-for": [0],
+        "react/jsx-no-target-blank": [0],
+        "react/no-did-mount-set-state": 0,
+        "jsx-a11y/no-static-element-interactions": [0],
+        "jsx-a11y/iframe-has-title": [0],
+        "react/no-array-index-key": [0],
+        "react/default-props-match-prop-types": [1],
+        "jsx-a11y/img-has-alt": [0],
+        "react/self-closing-comp": [0],
+        "react/no-unused-state": "warn",
+        "import/default": "warn",
+        "react/jsx-closing-tag-location": "warn",
+        "jsx-a11y/href-no-hash": [0],
+        "jsx-a11y/no-autofocus": "warn",
+        "react/jsx-wrap-multilines": "warn",
+        "jsx-a11y/click-events-have-key-events": [0],
+        "jsx-a11y/no-redundant-roles": "warn",
+        "jsx-a11y/accessible-emoji": "warn",
+        "jsx-a11y/anchor-is-valid": "warn",
+        "react/no-will-update-set-state": "warn",
+        "jsx-a11y/alt-text": "warn",
+        "react/prefer-stateless-function": "warn",
+        "react/jsx-indent": "warn",
+        "react/jsx-max-props-per-line": "warn",
+        "jsx-a11y/no-noninteractive-element-interactions": "warn",
+        "react/sort-comp": [1, {
+          order: [
+            'static-methods',
+            'lifecycle',
+            'everything-else',
+            'render'
+          ],
+          groups: {
+            lifecycle: [
+              'displayName',
+              'propTypes',
+              'contextTypes',
+              'childContextTypes',
+              'mixins',
+              'statics',
+              'defaultProps',
+              'constructor',
+              'getDefaultProps',
+              'getInitialState',
+              'props',
+              'state',
+              'getChildContext',
+              'componentWillMount',
+              'componentDidMount',
+              'componentWillReceiveProps',
+              'shouldComponentUpdate',
+              'componentWillUpdate',
+              'componentDidUpdate',
+              'componentWillUnmount',
+              'componentWillAppear',
+              'componentDidAppear',
+              'componentWillEnter',
+              'componentDidEnter',
+              'componentWillLeave',
+              'componentDidLeave'
+            ]
+          }
+        }],
+        "react/no-multi-comp": 1,
+        "semi": 2,
+        "flowtype/boolean-style": [
+          2,
+          "boolean"
+        ],
+        "flowtype/define-flow-type": 1,
+        "flowtype/delimiter-dangle": [
+          2,
+          "never"
+        ],
+        "flowtype/generic-spacing": [
+          2,
+          "never"
+        ],
+        "flowtype/no-primitive-constructor-types": 2,
+        "flowtype/object-type-delimiter": [
+          2,
+          "comma"
+        ],
+        "flowtype/require-parameter-type": 2,
+        "flowtype/require-valid-file-annotation": 2,
+        "flowtype/semi": [
+          2,
+          "always"
+        ],
+        "flowtype/space-after-type-colon": [
+          2,
+          "always"
+        ],
+        "flowtype/space-before-generic-bracket": [
+          2,
+          "never"
+        ],
+        "flowtype/space-before-type-colon": [
+          2,
+          "never"
+        ],
+        "flowtype/type-id-match": 0,
+        "flowtype/union-intersection-spacing": [
+          2,
+          "always"
+        ],
+        "flowtype/use-flow-type": 1,
+        "flowtype/valid-syntax": 1
+    },
+    "plugins": [
+        "jsx-a11y",
+        "react",
+        "import",
+        "jasmine",
+        "flowtype",
+        "webdriverio"
+    ],
+    "settings": {
+        "ecmascript": 6,
+        "import/resolver": {
+            "webpack": {
+                "config": "webpack/config.client.babel.js"
+            }
+        },
+        "import/parser": "babel-eslint",
+        "babel-module-alias": {},
+        "import/cache": 1000,
+        "import/ignore": ["node_modules", "\\.scss$"],
+        "flowtype": {
+          "onlyFilesWithFlowAnnotation": true
+        }
+    },
+}

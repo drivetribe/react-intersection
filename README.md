@@ -1,13 +1,42 @@
 # React Intersection
 
-## A React interface for the Intersection Observer API
+### A React interface for the Intersection Observer API
 
 **React Intersection** provides a simple component-based interface to the [Intersection Observer API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API).
 
-It provides three core components: `IntersectionRoot`, `IntersectionElement` and `IntersectionElementChild`.
+It provides two core components: `IntersectionRoot` and `IntersectionElement`.
 
-- **`IntersectionRoot`**: **Optionally** defines a new `root` element for children `IntersectionElement` components to observe (browser viewport is used by default).
-- **`IntersectionElement`**: Observes intersection events with its parent `IntersectionRoot` (or browser viewport if none defined).
+- **`IntersectionRoot`**: Creates a new `IntersectionObserver` with either the browser viewport or its direct DOM child as the observed `root`.
+- **`IntersectionElement`**: Adds its direct DOM child as an observer of the nearest parent `IntersectionRoot`.
+
+## Example
+
+```javascript
+class LazyLoadImage extends Component {
+  state = {
+    isVisible: false
+  };
+
+  checkVisibility = ({ isIntersecting }) => isIntersecting && this.setState({ isVisible: true });
+
+  render() {
+    const { src } = this.props;
+    const { isVisible } = this.state;
+
+    return (
+      <IntersectionElement once onChange={this.checkVisibility}>
+        <img src={isVisible ? src : ''}/>
+      </IntersectionElement>
+    );
+  }
+}
+
+const Site = () => (
+  <IntersectionRoot viewport>
+    <LazyLoadImage src="path/to/image.jpg">
+  </IntersectionRoot>
+);
+```
 
 ## Install
 
@@ -17,19 +46,27 @@ It provides three core components: `IntersectionRoot`, `IntersectionElement` and
 npm install react-intersection --save
 ```
 
-### Yarn
-
-```bash
-yarn add react-intersection
-```
-
 ## Usage
 
-### Observe 
+### Observe an element
+
+`IntersectionElement` can wrap any DOM element.
+
+By default, 
+
+```javascript
+import { IntersectionElement } from 'react-intersection';
+
+const Item = () => (
+  <IntersectionElement>
+    <li></li>
+  </IntersectionElement>
+);
+```
 
 ### Define a new root
 
-`IntersectionRoot` is used to wrap an element that's to be used as a new IntersectionObserver:
+`IntersectionRoot` is used to wrap an element that's to be used as a new `IntersectionObserver` `root`:
 
 ```javascript
 import { IntersectionRoot } from 'react-intersection';
@@ -53,7 +90,7 @@ To create a new browser viewport root with different settings, we can pass `root
 
 ```javascript
 const IntersectViewportWithMargins = ({ children }) => (
-  <IntersectionRoot root={null} margin="20px 20px 20px 20px">
+  <IntersectionRoot viewport margin="20px 20px 20px 20px">
     {children}
   </IntersectionRoot>
 );
@@ -85,11 +122,11 @@ Define a new IntersectionObserver.
 
 #### Props
 
-##### `root?: null`
+##### `viewport?: boolean = false`
 
-Usually not set and defaults to the child element. If passed `null`, will create a new IntersectionObserver using the browser viewport.
+If `true`, sets the browser viewport
 
-##### `margin?: string = '0px 0px 0px 0p'`
+##### `margin?: string = '0px 0px 0px 0px'`
 
 A space-delimited list of margins that effectively change the observed bounding box.
 
@@ -101,8 +138,12 @@ If `IntersectionRoot` is **not** a viewport observer, these values can be define
 
 An array of values between `0` and `1` that dictates at which ratios the IntersectionObserver should fire callbacks. Thresholds are fully explained in the [MDN Intersection Observer API article](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API#Thresholds).
 
-## Polyfill
+## Browser support
 
-React Intersection requires [Intersection Observer API browser support](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API#Browser_compatibility).
+### Intersection Observer API
 
-For other browsers, you can optionally [install a polyfill](https://www.npmjs.com/package/intersection-observer).
+[Browser support](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API#Browser_compatibility) | [Polyfill](https://www.npmjs.com/package/intersection-observer)
+
+### WeakMap
+
+[Browser support](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap#Browser_compatibility) | [Polyfill](https://www.npmjs.com/package/weakmap-polyfill)
