@@ -1,4 +1,4 @@
-# React Intersection
+# <img alt="React Intersection" src="https://user-images.githubusercontent.com/7850794/34434126-db688af8-ec7b-11e7-9527-a7a2c37edc3b.png" width="500">
 
 ### A React interface for the Intersection Observer API
 
