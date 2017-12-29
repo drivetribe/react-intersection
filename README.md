@@ -1,4 +1,4 @@
-# React Intersection
+
 
 ### A React interface for the Intersection Observer API
 
