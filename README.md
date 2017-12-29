@@ -9,34 +9,15 @@ It provides two core components: `IntersectionRoot` and `IntersectionElement`.
 - **`IntersectionRoot`**: Creates a new `IntersectionObserver` with either the browser viewport or its direct DOM child as the observed `root`.
 - **`IntersectionElement`**: Adds its direct DOM child as an observer of the nearest parent `IntersectionRoot`.
 
-## Example
+## Contents
 
-```javascript
-class LazyLoadImage extends Component {
-  state = {
-    isVisible: false
-  };
-
-  checkVisibility = ({ isIntersecting }) => isIntersecting && this.setState({ isVisible: true });
-
-  render() {
-    const { src } = this.props;
-    const { isVisible } = this.state;
-
-    return (
-      <IntersectionElement once onChange={this.checkVisibility}>
-        <img src={isVisible ? src : ''}/>
-      </IntersectionElement>
-    );
-  }
-}
-
-const Site = () => (
-  <IntersectionRoot viewport>
-    <LazyLoadImage src="path/to/image.jpg">
-  </IntersectionRoot>
-);
-```
+- [Install](#Install)
+- [Usage](#Usage)
+- [API](#API)
+- [Browser support](#Browser_support)
+- [Roadmap](#Roadmap)
+- [Example](#Example)
+- [Social](#Social)
 
 ## Install
 
@@ -147,3 +128,40 @@ An array of values between `0` and `1` that dictates at which ratios the Interse
 ### WeakMap
 
 [Browser support](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap#Browser_compatibility) | [Polyfill](https://www.npmjs.com/package/weakmap-polyfill)
+
+## Roadmap
+
+
+
+## Social
+
+Follow DriveTribe Engineering on: [Medium](https://medium.com/drivetribe-engineering) | [Twitter](https://twitter.com/drivetribetech)
+
+## Example
+
+```javascript
+class LazyLoadImage extends Component {
+  state = {
+    isVisible: false
+  };
+
+  checkVisibility = ({ isIntersecting }) => isIntersecting && this.setState({ isVisible: true });
+
+  render() {
+    const { src } = this.props;
+    const { isVisible } = this.state;
+
+    return (
+      <IntersectionElement once onChange={this.checkVisibility}>
+        <img src={isVisible ? src : ''}/>
+      </IntersectionElement>
+    );
+  }
+}
+
+const Site = () => (
+  <IntersectionRoot viewport>
+    <LazyLoadImage src="path/to/image.jpg">
+  </IntersectionRoot>
+);
+```

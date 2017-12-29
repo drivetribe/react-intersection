@@ -10,7 +10,7 @@ export default class IntersectionRoot extends Component {
 
   static defaultProps = {
     viewport: false,
-    margin: '0px',
+    margin: '0px 0px 0px 0px',
     threshold: [0, 1]
   };
 
@@ -54,7 +54,10 @@ export default class IntersectionRoot extends Component {
 
   flushQueue() {
     if (!this.intersectionObserver) return;
-    this.observedQueue.forEach(({ child, onChange }) => this.observedMap.set(child, onChange));
+    this.observedQueue.forEach(({ child, onChange }) => {
+      this.observedMap.set(child, onChange);
+      this.intersectionObserver.observe(child);
+    });
   }
 
   fireListener = (entry) => {
