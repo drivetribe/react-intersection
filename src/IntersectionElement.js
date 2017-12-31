@@ -1,29 +1,53 @@
 // @flow
-import { Component } from 'react';
+import * as React from 'react';
 import { findDOMNode } from 'react-dom';
-import PropTypes from 'prop-types';
+import PropTypes, { instanceOf } from 'prop-types';
+import IntersectionObserverWrapper from './intersection-observer';
 
-export default class IntersectionElement extends Component {
+import type { OnChange } from './types';
+
+type Props = {
+  children: React.Node,
+  once?: boolean,
+  onChange: OnChange
+};
+
+let defaultObserver: IntersectionObserverWrapper;
+const getDefaultObserver = () => {
+  if (!defaultObserver) defaultObserver = new IntersectionObserverWrapper({});
+  return defaultObserver;
+};
+
+export default class IntersectionElement extends React.Component<Props> {
   static contextTypes = {
     observe: PropTypes.func,
     unobserve: PropTypes.func
   };
 
+  node: HTMLElement;
+  observe: (node: HTMLElement, onChange: OnChange) => any;
+  unobserve: (node: HTMLElement) => any;
+
   componentDidMount() {
     const { observe, unobserve } = this.context;
-    
-    this.node = findDOMNode(this);
+    const node = findDOMNode(this);
 
-    observe(this.node, (entry: IntersectionObserverEntry) => {
-      const { onChange, once } = this.props;
-      onChange(entry);
-      if (once && entry.isIntersecting) unobserve(this.node);
-    });
+    if (node && node instanceof HTMLElement) {
+      this.node = node;
+
+      this.observe = observe || getDefaultObserver().observe;
+      this.unobserve = unobserve || getDefaultObserver().unobserve;
+
+      this.observe(this.node, (entry: IntersectionObserverEntry) => {
+        const { onChange, once } = this.props;
+        onChange(entry);
+        if (once && entry.isIntersecting) this.unobserve(this.node);
+      });
+    }
   }
 
   componentWillUnmount() {
-    const { unobserve } = this.context;
-    unobserve(this.node);
+    this.unobserve(this.node);
   }
 
   render() {

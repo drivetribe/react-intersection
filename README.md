@@ -1,13 +1,17 @@
 # <img alt="React Intersection" src="https://user-images.githubusercontent.com/7850794/34434126-db688af8-ec7b-11e7-9527-a7a2c37edc3b.png" width="500">
 
-### A React interface for the Intersection Observer API
-
 **React Intersection** provides a simple component-based interface to the [Intersection Observer API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API).
 
-It provides two core components: `IntersectionRoot` and `IntersectionElement`.
+It provides two core components: `IntersectionElement` and `IntersectionRoot`.
 
-- **`IntersectionRoot`**: Creates a new `IntersectionObserver` with either the browser viewport or its direct DOM child as the observed `root`.
-- **`IntersectionElement`**: Adds its direct DOM child as an observer of the nearest parent `IntersectionRoot`.
+- **`IntersectionElement`** adds its direct DOM child as an observer of the nearest parent `IntersectionRoot`, or the browser viewport if none found.
+- **`IntersectionRoot`** **optionally** creates a new `IntersectionObserver` with either the browser viewport or its direct DOM child as the observed `root`.
+
+React Intersection is:
+
+- **Tiny:** Less than 1kb.
+- **Unopinionated:** Provides the full [`IntersectionObserverEntry`](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserverEntry) to each `onChange` handler. A great starting point for more specific functionality.
+- **Component-based:** No need to provide selectors or `Node`s to set `IntersectionObserver.root`.
 
 ## Contents
 
@@ -15,7 +19,7 @@ It provides two core components: `IntersectionRoot` and `IntersectionElement`.
 - [Usage](#Usage)
 - [API](#API)
 - [Browser support](#Browser_support)
-- [Roadmap](#Roadmap)
+- [Suggested improvements](#Suggested_improvements)
 - [Example](#Example)
 - [Social](#Social)
 
@@ -29,25 +33,35 @@ npm install react-intersection --save
 
 ## Usage
 
-### Observe an element
+### Observe an element's visibility
 
-`IntersectionElement` can wrap any DOM element.
+By default, wrapping a component with `IntersectionElement` will subscribe the first child DOM element to a default viewport `IntersectionObserver`, with `threshold` set to `[0, 1]`.
 
-By default, 
+This means `onChange` will fire when the element is first fully off/on screen, and partially on/off screen.
 
 ```javascript
 import { IntersectionElement } from 'react-intersection';
 
-const Item = () => (
-  <IntersectionElement>
-    <li></li>
-  </IntersectionElement>
-);
+class Item extends React.Component {
+  state = {
+    isIntersecting: false
+  };
+
+  setVisibility = ({ isIntersecting }) => this.setState({ isIntersecting });
+
+  render() {
+    return (
+      <IntersectionElement onChange={this.setVisibility}>
+        <li />
+      </IntersectionElement>
+    );
+  }
+}
 ```
 
 ### Define a new root
 
-`IntersectionRoot` is used to wrap an element that's to be used as a new `IntersectionObserver` `root`:
+We can use parent elements as the `IntersectionObserver.root` instead of the viewport:
 
 ```javascript
 import { IntersectionRoot } from 'react-intersection';
@@ -61,13 +75,11 @@ const ScrollableList = () => (
 );
 ```
 
-In the above example, `ul` will be the `root` of the new IntersectionObserver that any children `IntersectionElement`s will observe.
+In the above example, `ul` will be the `root` of the new `IntersectionObserver` that any children `IntersectionElement`s will subscribe to.
 
 ### Define a new browser viewport root
 
-By default, if an `IntersectionElement` is created that **isn't** the child of an `IntersectionRoot`, it'll observe a browser viewport IntersectionObserver with no `margin` and a `threshold` of `[0, 1]`.
-
-To create a new browser viewport root with different settings, we can pass `root={null}` to `IntersectionRoot`:
+To create a new browser viewport root with non-default settings, we can pass `viewport` to `IntersectionRoot`:
 
 ```javascript
 const IntersectViewportWithMargins = ({ children }) => (
@@ -121,6 +133,8 @@ An array of values between `0` and `1` that dictates at which ratios the Interse
 
 ## Browser support
 
+React Intersection is dependent on the browser Intersection Observer API and JavaScript's `WeakMap`:
+
 ### Intersection Observer API
 
 [Browser support](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API#Browser_compatibility) | [Polyfill](https://www.npmjs.com/package/intersection-observer)
@@ -129,15 +143,72 @@ An array of values between `0` and `1` that dictates at which ratios the Interse
 
 [Browser support](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap#Browser_compatibility) | [Polyfill](https://www.npmjs.com/package/weakmap-polyfill)
 
-## Roadmap
+## Suggested improvements
 
+### Make `IntersectionRoot` optional
 
+Currently, `IntersectionRoot` **must** be added at least once.
+
+It'd be great if developers could simply use `IntersectionElement` which, if not the child of any `IntersectionRoot`, acted as if it were the child of:
+
+```javascript
+<IntersectionRoot viewport />
+```
+
+### `IntersectionElementChild`
+
+Currently, `IntersectionElement` can be used to set something like an `isIntersecting` or `intersectionRatio` state, which can then be passed down to children via props.
+
+It might be neat, convenient and performant to wrap larger components with `IntersectionElement` which smaller (and more numerous) `IntersectionElementChild` components could then subscribe to via context.
+
+`IntersectionElementChild`'s `onChange` function would fire only when its parent `IntersectionElement` crosses the defined `threshold`.
+
+For example:
+
+```javascript
+class LazyImage extends React.Component {
+  state = {
+    isVisible: false
+  };
+
+  checkVisibility = ({ isIntersecting }) => isIntersecting && this.setState({ isVisible: true });
+
+  render() {
+    const { src } = this.props;
+    const { isVisible } = this.state;
+
+    return (
+      <IntersectionElementChild onChange={this.checkVisibility}>
+        <img src={isVisible ? src : ''}/>
+      </IntersectionElement>
+    );
+  }
+}
+
+const Product = ({ image, name, link }) => (
+  <li>
+    <a href={link}>
+      <LazyImage src={image} />
+    </a>
+  </li>
+); 
+
+const ProductShelf = ({ products }) => (
+  <IntersectionElement once>
+    <ul>
+      {products.map((product) => <Product {...product} />)}
+    </ul>
+  </IntersectionElement>
+);
+```
 
 ## Social
 
 Follow DriveTribe Engineering on: [Medium](https://medium.com/drivetribe-engineering) | [Twitter](https://twitter.com/drivetribetech)
 
 ## Example
+
+### Lazy loaded image
 
 ```javascript
 class LazyLoadImage extends Component {

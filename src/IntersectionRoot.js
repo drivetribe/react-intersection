@@ -1,17 +1,23 @@
 // @flow
-import { Component } from 'react';
+import * as React from 'react';
 import { findDOMNode } from 'react-dom';
 import PropTypes from 'prop-types';
+import IntersectionObserverWrapper from './intersection-observer';
 
-export default class IntersectionRoot extends Component {
-  observedQueue: HTMLElement[] = [];
-  observedMap: WeakMap = new WeakMap();
-  intersectionObserver: IntersectionObserver;
+import type { OnChange } from './types';
+
+type Props = {
+  children: React.Node,
+  viewport?: boolean,
+  margin?: string,
+  threshold?: number[]
+};
+
+export default class IntersectionRoot extends React.Component<Props> {
+  intersectionObserver: IntersectionObserverWrapper;
 
   static defaultProps = {
-    viewport: false,
-    margin: '0px 0px 0px 0px',
-    threshold: [0, 1]
+    viewport: false
   };
 
   static childContextTypes = {
@@ -19,15 +25,14 @@ export default class IntersectionRoot extends Component {
     unobserve: PropTypes.func
   };
 
-  componentDidMount() {
-    this.initIntersectionObserver();
-    this.flushQueue();
+  componentWillMount() {
+    this.initIntersectionObserver(this.props);
   }
 
-  componentWillUpdate(nextProps) {
+  componentWillUpdate(nextProps: Props) {
     if (nextProps !== this.props) {
       this.intersectionObserver.disconnect();
-      this.initIntersectionObserver();
+      this.initIntersectionObserver(nextProps);
     }
   }
 
@@ -37,45 +42,22 @@ export default class IntersectionRoot extends Component {
 
   getChildContext() {
     return {
-      observe: this.observe,
-      unobserve: this.unobserve
+      observe: (child: HTMLElement, onChange: OnChange) => this.intersectionObserver.observe(child, onChange),
+      unobserve: (child: HTMLElement) => this.intersectionObserver.unobserve(child)
     };
   }
 
-  initIntersectionObserver() {
-    const { viewport, margin, threshold } = this.props;
+  initIntersectionObserver({ viewport, margin, threshold }: Props) {
+    const root = viewport === true ? null : findDOMNode(this);
 
-    this.intersectionObserver = new IntersectionObserver(this.fireListeners, {
-      root: viewport === true ? null : findDOMNode(this),
-      rootMargin: margin,
-      threshold
-    });
+    if ((root && root instanceof HTMLElement) || root === null) {
+      this.intersectionObserver = new IntersectionObserverWrapper({
+        root,
+        rootMargin: margin,
+        threshold
+      });
+    }
   }
-
-  flushQueue() {
-    if (!this.intersectionObserver) return;
-    this.observedQueue.forEach(({ child, onChange }) => {
-      this.observedMap.set(child, onChange);
-      this.intersectionObserver.observe(child);
-    });
-  }
-
-  fireListener = (entry) => {
-    const onChange = this.observedMap.get(entry.target);
-    if (onChange) onChange(entry);
-  };
-
-  fireListeners = (entries) => entries.forEach(this.fireListener);
-
-  observe = (child, onChange) => {
-    this.observedQueue.push({ child, onChange });
-    this.flushQueue();
-  };
-
-  unobserve = (child) => {
-    this.observedMap.delete(child);
-    this.intersectionObserver.unobserve(child);
-  };
 
   render() {
     return this.props.children;
