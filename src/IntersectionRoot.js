@@ -29,10 +29,11 @@ export default class IntersectionRoot extends React.Component<Props> {
     this.initIntersectionObserver(this.props);
   }
 
-  componentWillUpdate(nextProps: Props) {
-    if (nextProps !== this.props) {
-      this.intersectionObserver.disconnect();
-      this.initIntersectionObserver(nextProps);
+  componentWillReceiveProps(nextProps: Props) {
+    const { viewport, margin, threshold } = this.props;
+
+    if (nextProps.viewport !== viewport || nextProps.margin !== margin || nextProps.threshold !== threshold) {
+      this.intersectionObserver.reconnect(nextProps);
     }
   }
 

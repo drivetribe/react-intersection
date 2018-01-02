@@ -1,6 +1,6 @@
 {
   "name": "react-intersection",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A React interface for the Intersection Observer API",
   "main": "./lib/index.js",
   "files": ["lib"],

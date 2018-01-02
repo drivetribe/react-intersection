@@ -15,14 +15,19 @@ type QueuedItem = {
 export default class IntersectionObserverWrapper {
   observedQueue: QueuedItem[] = [];
   observedMap: WeakMap<HTMLElement, Function> = new WeakMap();
+  activeObservers: HTMLElement[] = [];
   observer: IntersectionObserver;
   props: Props;
 
-  constructor({ root, rootMargin = '0px 0px 0px 0px', threshold = [0, 1]}: Props) {
+  constructor(props: Props) {
     if (typeof IntersectionObserver === 'undefined') return;
 
-    this.observer = new IntersectionObserver(this.fireListeners, { root, rootMargin, threshold });
+    this.createObserver(props);
     this.flushQueue();
+  }
+
+  createObserver({ root, rootMargin = '0px 0px 0px 0px', threshold = [0, 1] }: Props) {
+    this.observer = new IntersectionObserver(this.fireListeners, { root, rootMargin, threshold });
   }
 
   flushQueue() {
@@ -43,15 +48,23 @@ export default class IntersectionObserverWrapper {
 
   observe = (child: HTMLElement, onChange: OnChange) => {
     this.observedQueue.push({ child, onChange });
+    this.activeObservers.push(child);
     this.flushQueue();
   };
 
   unobserve = (child: HTMLElement) => {
     this.observedMap.delete(child);
     this.observer.unobserve(child);
+    this.activeObservers.splice(this.activeObservers.indexOf(child), 1);
   };
 
   disconnect() {
     this.observer.disconnect();
+  }
+
+  reconnect(props: Props) {
+    this.disconnect();
+    this.createObserver(props);
+    this.activeObservers.forEach((child) => this.observe(child, this.observedMap.get(child)));
   }
 }
