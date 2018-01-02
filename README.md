@@ -1,5 +1,7 @@
 # <img alt="React Intersection" src="https://user-images.githubusercontent.com/7850794/34434126-db688af8-ec7b-11e7-9527-a7a2c37edc3b.png" width="500">
 
+[![npm](https://img.shields.io/npm/v/react-intersection.svg?style=flat-square)](https://www.npmjs.com/package/react-intersection) [![npm](https://img.shields.io/npm/dm/react-intersection.svg?style=flat-square)](https://www.npmjs.com/package/react-intersection) 
+
 **React Intersection** provides a simple component-based interface to the [Intersection Observer API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API).
 
 It provides two core components: `IntersectionElement` and `IntersectionRoot`.
@@ -7,25 +9,22 @@ It provides two core components: `IntersectionElement` and `IntersectionRoot`.
 - **`IntersectionElement`** adds its direct DOM child as an observer of the nearest parent `IntersectionRoot`, or the browser viewport if none found.
 - **`IntersectionRoot`** **optionally** creates a new `IntersectionObserver` with either the browser viewport or its direct DOM child as the observed `root`.
 
-React Intersection is:
+#### React Intersection is:
 
 - **Tiny:** Less than 1kb.
-- **Unopinionated:** Provides the full [`IntersectionObserverEntry`](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserverEntry) to each `onChange` handler. A great starting point for more specific functionality.
+- **Unopinionated:** Provides the full [`IntersectionObserverEntry`](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserverEntry) object to each `onChange` handler. A great low-level starting point for more specific functionality.
 - **Component-based:** No need to provide selectors or `Node`s to set `IntersectionObserver.root`.
 
 ## Contents
 
-- [Install](#Install)
-- [Usage](#Usage)
-- [API](#API)
-- [Browser support](#Browser_support)
-- [Suggested improvements](#Suggested_improvements)
-- [Example](#Example)
-- [Social](#Social)
+- [Install](#install)
+- [Usage](#usage)
+- [API](#api)
+- [Browser support](#browser_support)
+- [Suggested improvements](#suggested_improvements)
+- [Social](#social)
 
 ## Install
-
-### npm
 
 ```bash
 npm install react-intersection --save
@@ -33,11 +32,9 @@ npm install react-intersection --save
 
 ## Usage
 
-### Observe an element's visibility
+By default, wrapping a component with `IntersectionElement` will subscribe its first child DOM element to a default viewport `IntersectionObserver`, with `threshold` set to `[0, 1]`.
 
-By default, wrapping a component with `IntersectionElement` will subscribe the first child DOM element to a default viewport `IntersectionObserver`, with `threshold` set to `[0, 1]`.
-
-This means `onChange` will fire when the element is first fully off/on screen, and partially on/off screen.
+This means `onChange` will fire when the element is first fully and partially off/on screen.
 
 ```javascript
 import { IntersectionElement } from 'react-intersection';
@@ -59,9 +56,9 @@ class Item extends React.Component {
 }
 ```
 
-### Define a new root
+### Define a new `root`
 
-We can use parent elements as the `IntersectionObserver.root` instead of the viewport:
+We can use a parent element as the `IntersectionObserver.root` instead of the viewport:
 
 ```javascript
 import { IntersectionRoot } from 'react-intersection';
@@ -79,7 +76,7 @@ In the above example, `ul` will be the `root` of the new `IntersectionObserver` 
 
 ### Define a new browser viewport root
 
-To create a new browser viewport root with non-default settings, we can pass `viewport` to `IntersectionRoot`:
+To create a new browser viewport root with non-default settings, we can pass a `viewport` prop to `IntersectionRoot`:
 
 ```javascript
 const IntersectViewportWithMargins = ({ children }) => (
@@ -117,7 +114,7 @@ Define a new IntersectionObserver.
 
 ##### `viewport?: boolean = false`
 
-If `true`, sets the browser viewport
+If `true`, sets the browser viewport as the `IntersectionObserver.root` property. If `false`, uses the first DOM child.
 
 ##### `margin?: string = '0px 0px 0px 0px'`
 
@@ -133,7 +130,7 @@ An array of values between `0` and `1` that dictates at which ratios the Interse
 
 ## Browser support
 
-React Intersection is dependent on the browser Intersection Observer API and JavaScript's `WeakMap`:
+React Intersection is dependent on the `IntersectionObserver` API and `WeakMap`:
 
 ### Intersection Observer API
 
@@ -145,23 +142,13 @@ React Intersection is dependent on the browser Intersection Observer API and Jav
 
 ## Suggested improvements
 
-### Make `IntersectionRoot` optional
-
-Currently, `IntersectionRoot` **must** be added at least once.
-
-It'd be great if developers could simply use `IntersectionElement` which, if not the child of any `IntersectionRoot`, acted as if it were the child of:
-
-```javascript
-<IntersectionRoot viewport />
-```
-
 ### `IntersectionElementChild`
 
 Currently, `IntersectionElement` can be used to set something like an `isIntersecting` or `intersectionRatio` state, which can then be passed down to children via props.
 
-It might be neat, convenient and performant to wrap larger components with `IntersectionElement` which smaller (and more numerous) `IntersectionElementChild` components could then subscribe to via context.
+It might be neat, convenient and performant to be able to wrap larger components with `IntersectionElement` which smaller (and more numerous) `IntersectionElementChild` components could then subscribe to via context.
 
-`IntersectionElementChild`'s `onChange` function would fire only when its parent `IntersectionElement` crosses the defined `threshold`.
+For instance, we might use `IntersectionElement` to detect when a "Latest posts" component is on screen, and use `IntersectionElementChild` to lazy load all of its child images at once (rather than tracking the visibility of them all individually).
 
 For example:
 
@@ -205,34 +192,3 @@ const ProductShelf = ({ products }) => (
 ## Social
 
 Follow DriveTribe Engineering on: [Medium](https://medium.com/drivetribe-engineering) | [Twitter](https://twitter.com/drivetribetech)
-
-## Example
-
-### Lazy loaded image
-
-```javascript
-class LazyLoadImage extends Component {
-  state = {
-    isVisible: false
-  };
-
-  checkVisibility = ({ isIntersecting }) => isIntersecting && this.setState({ isVisible: true });
-
-  render() {
-    const { src } = this.props;
-    const { isVisible } = this.state;
-
-    return (
-      <IntersectionElement once onChange={this.checkVisibility}>
-        <img src={isVisible ? src : ''}/>
-      </IntersectionElement>
-    );
-  }
-}
-
-const Site = () => (
-  <IntersectionRoot viewport>
-    <LazyLoadImage src="path/to/image.jpg">
-  </IntersectionRoot>
-);
-```
