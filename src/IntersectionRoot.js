@@ -33,7 +33,7 @@ export default class IntersectionRoot extends React.Component<Props> {
     const { viewport, margin, threshold } = this.props;
 
     if (nextProps.viewport !== viewport || nextProps.margin !== margin || nextProps.threshold !== threshold) {
-      this.intersectionObserver.reconnect(nextProps);
+      this.initIntersectionObserver(nextProps);
     }
   }
 
@@ -52,11 +52,17 @@ export default class IntersectionRoot extends React.Component<Props> {
     const root = viewport === true ? null : findDOMNode(this);
 
     if ((root && root instanceof HTMLElement) || root === null) {
-      this.intersectionObserver = new IntersectionObserverWrapper({
+      const props = {
         root,
         rootMargin: margin,
         threshold
-      });
+      };
+
+      if (this.intersectionObserver) {
+        this.intersectionObserver.reconnect(props);
+      } else {
+        this.intersectionObserver = new IntersectionObserverWrapper(props);
+      }
     }
   }
 
