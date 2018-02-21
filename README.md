@@ -21,7 +21,7 @@ It provides two core components: `IntersectionElement` and `IntersectionRoot`.
 - [Usage](#usage)
 - [API](#api)
 - [Browser support](#browser_support)
-- [Suggested improvements](#suggested_improvements)
+- [Plugins](#plugins)
 - [Social](#social)
 
 ## Install
@@ -140,54 +140,9 @@ React Intersection is dependent on the `IntersectionObserver` API and `WeakMap`:
 
 [Browser support](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap#Browser_compatibility) | [Polyfill](https://www.npmjs.com/package/weakmap-polyfill)
 
-## Suggested improvements
+## Plugins
 
-### `IntersectionElementChild`
-
-Currently, `IntersectionElement` can be used to set something like an `isIntersecting` or `intersectionRatio` state, which can then be passed down to children via props.
-
-It might be neat, convenient and performant to be able to wrap larger components with `IntersectionElement` which smaller (and more numerous) `IntersectionElementChild` components could then subscribe to via context.
-
-For instance, we might use `IntersectionElement` to detect when a "Latest posts" component is on screen, and use `IntersectionElementChild` to lazy load all of its child images at once (rather than tracking the visibility of them all individually).
-
-For example:
-
-```javascript
-class LazyImage extends React.Component {
-  state = {
-    isVisible: false
-  };
-
-  checkVisibility = ({ isIntersecting }) => isIntersecting && this.setState({ isVisible: true });
-
-  render() {
-    const { src } = this.props;
-    const { isVisible } = this.state;
-
-    return (
-      <IntersectionElementChild onChange={this.checkVisibility}>
-        <img src={isVisible ? src : ''}/>
-      </IntersectionElement>
-    );
-  }
-}
-
-const Product = ({ image, name, link }) => (
-  <li>
-    <a href={link}>
-      <LazyImage src={image} />
-    </a>
-  </li>
-); 
-
-const ProductShelf = ({ products }) => (
-  <IntersectionElement once>
-    <ul>
-      {products.map((product) => <Product {...product} />)}
-    </ul>
-  </IntersectionElement>
-);
-```
+- [React Intersection Image](https://github.com/drivetribe/react-intersection-image)
 
 ## Social
 
