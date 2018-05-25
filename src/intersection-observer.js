@@ -65,6 +65,8 @@ export default class IntersectionObserverWrapper {
   reconnect(props: Props) {
     this.disconnect();
     this.createObserver(props);
-    this.activeObservers.forEach((child) => this.observe(child, this.observedMap.get(child)));
+    const observers = this.activeObservers;
+    this.activeObservers = [];
+    observers.forEach((child) => this.observe(child, this.observedMap.get(child)));
   }
 }

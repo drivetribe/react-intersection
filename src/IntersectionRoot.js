@@ -13,6 +13,8 @@ type Props = {
   threshold?: number[]
 };
 
+const deepCompareArray = (a: number[], b: number[]) => a.every((item, i) => item === b[i]);
+
 export default class IntersectionRoot extends React.Component<Props> {
   intersectionObserver: IntersectionObserverWrapper;
 
@@ -31,8 +33,9 @@ export default class IntersectionRoot extends React.Component<Props> {
 
   componentWillReceiveProps(nextProps: Props) {
     const { viewport, margin, threshold } = this.props;
+    const thresholdHasChanged = nextProps.threshold && threshold && deepCompareArray(nextProps.threshold, threshold);
 
-    if (nextProps.viewport !== viewport || nextProps.margin !== margin || nextProps.threshold !== threshold) {
+    if (nextProps.viewport !== viewport || nextProps.margin !== margin || thresholdHasChanged) {
       this.initIntersectionObserver(nextProps);
     }
   }
