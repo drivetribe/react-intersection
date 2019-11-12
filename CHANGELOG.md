@@ -2,6 +2,12 @@
 
 React Intersection adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.6] 2019-11-12
+
+### Fixes
+
+- Unobserve only once as Edge browsers throws a TypeMismatchError
+
 ## [1.0.5] 2018-03-06
 
 ### Fixes
