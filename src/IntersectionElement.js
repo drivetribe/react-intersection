@@ -41,13 +41,19 @@ export default class IntersectionElement extends React.Component<Props> {
       this.observe(this.node, (entry: IntersectionObserverEntry) => {
         const { onChange, once } = this.props;
         onChange(entry);
-        if (once && entry.isIntersecting) this.unobserve(this.node);
+        if (this.node && once && entry.isIntersecting) {
+          this.unobserve(this.node);
+          delete this.node;
+        }
       });
     }
   }
 
   componentWillUnmount() {
-    this.unobserve(this.node);
+    if (this.node) {
+      this.unobserve(this.node);
+      delete this.node;
+    }
   }
 
   render() {
