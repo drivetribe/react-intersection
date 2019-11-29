@@ -1,19 +1,19 @@
 // @flow
 import * as React from 'react';
-import { findDOMNode } from 'react-dom';
-import PropTypes from 'prop-types';
 import IntersectionObserverWrapper from './intersection-observer';
+import { IntersectionRootContext } from './intersection-root-context';
 
 import type { OnChange } from './types';
 
 type Props = {
-  children: React.Node,
+  children: React$Element<any>,
   viewport?: boolean,
   margin?: string,
   threshold?: number[]
 };
 
-const deepCompareArray = (a: number[], b: number[]) => a.every((item, i) => item === b[i]);
+const deepCompareArray = (a: number[], b: number[]) =>
+  a.every((item, i) => item === b[i]);
 
 export default class IntersectionRoot extends React.Component<Props> {
   intersectionObserver: IntersectionObserverWrapper;
@@ -22,37 +22,37 @@ export default class IntersectionRoot extends React.Component<Props> {
     viewport: false
   };
 
-  static childContextTypes = {
-    observe: PropTypes.func,
-    unobserve: PropTypes.func
-  };
-
-  componentWillMount() {
+  constructor(props: Props) {
+    super(props);
     this.initIntersectionObserver(this.props);
   }
 
-  componentWillReceiveProps(nextProps: Props) {
+  componentDidUpdate(prevProps: Props) {
     const { viewport, margin, threshold } = this.props;
-    const thresholdHasChanged = nextProps.threshold && threshold && deepCompareArray(nextProps.threshold, threshold);
+    const thresholdHasChanged =
+      prevProps.threshold &&
+      threshold &&
+      deepCompareArray(prevProps.threshold, threshold);
 
-    if (nextProps.viewport !== viewport || nextProps.margin !== margin || thresholdHasChanged) {
-      this.initIntersectionObserver(nextProps);
+    if (
+      prevProps.viewport !== viewport ||
+      prevProps.margin !== margin ||
+      thresholdHasChanged
+    ) {
+      this.initIntersectionObserver(this.props);
     }
   }
 
   componentWillUnmount() {
-    this.intersectionObserver.disconnect();
+    if (this.intersectionObserver) {
+      this.intersectionObserver.disconnect();
+    }
   }
 
-  getChildContext() {
-    return {
-      observe: (child: HTMLElement, onChange: OnChange) => this.intersectionObserver.observe(child, onChange),
-      unobserve: (child: HTMLElement) => this.intersectionObserver.unobserve(child)
-    };
-  }
+  node: HTMLElement;
 
   initIntersectionObserver({ viewport, margin, threshold }: Props) {
-    const root = viewport === true ? null : findDOMNode(this);
+    const root = viewport === true ? null : this.node;
 
     if ((root && root instanceof HTMLElement) || root === null) {
       const props = {
@@ -70,6 +70,34 @@ export default class IntersectionRoot extends React.Component<Props> {
   }
 
   render() {
-    return this.props.children;
+    const { children, viewport } = this.props;
+
+    const contextValue = {
+      observe: (child: HTMLElement, onChange: OnChange) =>
+        this.intersectionObserver.observe(child, onChange),
+      unobserve: (child: HTMLElement) =>
+        this.intersectionObserver.unobserve(child)
+    };
+
+    return (
+      <IntersectionRootContext.Provider value={contextValue}>
+        {viewport
+          ? children
+          : React.Children.only(
+              React.cloneElement(children, {
+                ref: (node: any) => {
+                  this.node = node;
+                  const { ref } = children;
+
+                  if (typeof ref === 'function') {
+                    ref(node);
+                  } else if (ref !== null) {
+                    ref.current = node;
+                  }
+                }
+              })
+            )}
+      </IntersectionRootContext.Provider>
+    );
   }
 }
