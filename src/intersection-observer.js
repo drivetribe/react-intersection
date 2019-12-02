@@ -9,7 +9,7 @@ type Props = {
 
 type QueuedItem = {
   child: HTMLElement,
-  onChange: OnChange
+  onChange: ?OnChange
 };
 
 export default class IntersectionObserverWrapper {
@@ -26,8 +26,16 @@ export default class IntersectionObserverWrapper {
     this.flushQueue();
   }
 
-  createObserver({ root, rootMargin = '0px 0px 0px 0px', threshold = [0, 1] }: Props) {
-    this.observer = new IntersectionObserver(this.fireListeners, { root, rootMargin, threshold });
+  createObserver({
+    root,
+    rootMargin = '0px 0px 0px 0px',
+    threshold = [0, 1]
+  }: Props) {
+    this.observer = new IntersectionObserver(this.fireListeners, {
+      root,
+      rootMargin,
+      threshold
+    });
   }
 
   flushQueue() {
@@ -44,9 +52,10 @@ export default class IntersectionObserverWrapper {
     if (onChange) onChange(entry);
   };
 
-  fireListeners = (entries: IntersectionObserverEntry[]) => entries.forEach(this.fireListener);
+  fireListeners = (entries: IntersectionObserverEntry[]) =>
+    entries.forEach(this.fireListener);
 
-  observe = (child: HTMLElement, onChange: OnChange) => {
+  observe = (child: HTMLElement, onChange: ?OnChange) => {
     this.observedQueue.push({ child, onChange });
     this.activeObservers.push(child);
     this.flushQueue();
@@ -67,6 +76,8 @@ export default class IntersectionObserverWrapper {
     this.createObserver(props);
     const observers = this.activeObservers;
     this.activeObservers = [];
-    observers.forEach((child) => this.observe(child, this.observedMap.get(child)));
+    observers.forEach(child =>
+      this.observe(child, this.observedMap.get(child))
+    );
   }
 }

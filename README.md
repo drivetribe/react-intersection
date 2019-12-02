@@ -144,6 +144,6 @@ React Intersection is dependent on the `IntersectionObserver` API and `WeakMap`:
 
 - [React Intersection Image](https://github.com/drivetribe/react-intersection-image)
 
-## Social
+## Social	
 
 Follow DriveTribe Engineering on: [Medium](https://medium.com/drivetribe-engineering) | [Twitter](https://twitter.com/drivetribetech)
