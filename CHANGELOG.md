@@ -2,6 +2,12 @@
 
 React Intersection adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.1] 2019-12-03
+
+### Fixes
+
+- IntersectionRoot throws 'observe' and 'unobserve' undefined error on first load
+
 ## [2.0.0] 2019-11-29
 
 - Updated dependencies
