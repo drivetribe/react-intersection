@@ -74,9 +74,10 @@ export default class IntersectionRoot extends React.Component<Props> {
 
     const contextValue = {
       observe: (child: HTMLElement, onChange: OnChange) =>
+        this.intersectionObserver &&
         this.intersectionObserver.observe(child, onChange),
       unobserve: (child: HTMLElement) =>
-        this.intersectionObserver.unobserve(child)
+        this.intersectionObserver && this.intersectionObserver.unobserve(child)
     };
 
     return (
