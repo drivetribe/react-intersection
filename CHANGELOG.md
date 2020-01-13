@@ -2,6 +2,12 @@
 
 React Intersection adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.2] 2019-12-03
+
+### Fixes
+
+- IntersectionRoot doesn't observe the root element correctly
+
 ## [2.0.1] 2019-12-03
 
 ### Fixes

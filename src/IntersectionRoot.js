@@ -49,10 +49,10 @@ export default class IntersectionRoot extends React.Component<Props> {
     }
   }
 
-  node: HTMLElement;
+  node: { current: null | HTMLElement } = React.createRef();
 
   initIntersectionObserver({ viewport, margin, threshold }: Props) {
-    const root = viewport === true ? null : this.node;
+    const root = viewport === true ? null : this.node.current;
 
     if ((root && root instanceof HTMLElement) || root === null) {
       const props = {
@@ -87,7 +87,7 @@ export default class IntersectionRoot extends React.Component<Props> {
           : React.Children.only(
               React.cloneElement(children, {
                 ref: (node: any) => {
-                  this.node = node;
+                  this.node.current = node;
                   const { ref } = children;
 
                   if (typeof ref === 'function') {
